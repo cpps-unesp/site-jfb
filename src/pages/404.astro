@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import { IDIOMA_PADRAO, ehIdioma, textos } from '../lib/i18n';
+
+const primeiro = Astro.url.pathname.split('/')[1];
+const lang = ehIdioma(primeiro) ? primeiro : IDIOMA_PADRAO;
+const t = textos(lang);
+---
+
+<Base lang={lang} titulo={t.naoEncontrada} naoIndexar>
+  <div class="erro-pagina">
+    <h1>{t.naoEncontrada}</h1>
+    <p>{t.naoEncontradaTexto}</p>
+    <p><a class="botao" href={`/${lang}/`}>{t.voltarInicio}</a></p>
+  </div>
+</Base>

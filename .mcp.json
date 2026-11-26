@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "jfb-site": {
+      "type": "http",
+      "url": "https://jfb.franca.unesp.br/_emdash/api/mcp"
+    }
+  }
+}
