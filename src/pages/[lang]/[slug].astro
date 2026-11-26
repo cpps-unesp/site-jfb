@@ -1,0 +1,82 @@
+---
+// Página de texto (/pt/apresentacao, /pt/creditos...) ou lista de uma coleção
+// (/pt/noticias, /pt/verbetes, /pt/pesquisadores, /pt/exposicoes).
+import { Image, PortableText } from 'emdash/ui';
+import Base from '../../layouts/Base.astro';
+import { ehIdioma, formatarData, textos } from '../../lib/i18n';
+import { getItem, listarItens, resumoDe } from '../../lib/conteudo';
+import { POR_PAGINA, ehLista, tituloLista } from '../../lib/rota';
+
+const { lang, slug } = Astro.params;
+if (!ehIdioma(lang) || !slug) return new Response(null, { status: 404 });
+const t = textos(lang);
+
+const lista = ehLista(slug) ? slug : null;
+const pagina = lista ? null : await getItem('paginas', slug, lang);
+if (!lista && !pagina) return new Response(null, { status: 404 });
+
+let itens = lista ? await listarItens(lista, lang) : [];
+// Só as notícias são muitas o bastante para paginar.
+const paginaAtual = Math.max(1, Number(Astro.url.searchParams.get('pagina')) || 1);
+const totalPaginas = lista === 'noticias' ? Math.max(1, Math.ceil(itens.length / POR_PAGINA)) : 1;
+if (lista === 'noticias') itens = itens.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
+if (paginaAtual > totalPaginas) return new Response(null, { status: 404 });
+const titulo = lista ? tituloLista(lista, lang) : pagina!.titulo;
+---
+
+<Base lang={lang} titulo={titulo} secao={slug} descricao={pagina ? resumoDe(pagina) : undefined}>
+  {
+    pagina && (
+      <article>
+        <header class="cabeca">
+          <h1 {...pagina.edit?.title}>{pagina.titulo}</h1>
+        </header>
+        {pagina.imagem && (
+          <figure class="capa">
+            <Image image={pagina.imagem} alt={pagina.imagem.alt || ''} />
+          </figure>
+        )}
+        <div class="prosa" {...pagina.edit?.conteudo}>
+          <PortableText value={pagina.conteudo} />
+        </div>
+      </article>
+    )
+  }
+  {
+    lista && (
+      <section>
+        <header class="cabeca">
+          <h1>{titulo}</h1>
+        </header>
+        {itens.length === 0 && <p>{t.semItens}</p>}
+        <ul class:list={['lista', lista === 'pesquisadores' && 'com-foto']}>
+          {itens.map((item) => (
+            <li>
+              {lista === 'pesquisadores' &&
+                (item.imagem ? <Image image={item.imagem} alt="" width={96} height={96} /> : <span class="foto-vazia" />)}
+              <div>
+                <h2>
+                  <a href={`/${lang}/${lista}/${item.slug}`}>{item.titulo}</a>
+                </h2>
+                {item.subtitulo && <p>{item.subtitulo}</p>}
+                {(item.data || item.autor) && lista !== 'pesquisadores' && (
+                  <p class="meta">
+                    {[item.autor, formatarData(item.data, lang)].filter(Boolean).join(' · ')}
+                  </p>
+                )}
+                {lista !== 'pesquisadores' && resumoDe(item) && <p>{resumoDe(item)}</p>}
+              </div>
+            </li>
+          ))}
+        </ul>
+        {totalPaginas > 1 && (
+          <nav class="paginacao" aria-label={t.paginaDe(paginaAtual, totalPaginas)}>
+            {paginaAtual > 1 ? <a href={`?pagina=${paginaAtual - 1}`}>← {t.proxima}</a> : <span />}
+            <span>{t.paginaDe(paginaAtual, totalPaginas)}</span>
+            {paginaAtual < totalPaginas ? <a href={`?pagina=${paginaAtual + 1}`}>{t.anterior} →</a> : <span />}
+          </nav>
+        )}
+      </section>
+    )
+  }
+</Base>

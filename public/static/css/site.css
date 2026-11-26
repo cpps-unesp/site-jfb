@@ -1,0 +1,154 @@
+/* Site Jornais Franceses no Brasil.
+   Retoma a identidade do site antigo (fundo preto, pinceladas vinho e verde-azulado,
+   tipografia Josefin Sans), com texto mais claro e maior para leitura e contraste
+   AA. Fonte: Josefin Sans (SIL Open Font License), servida daqui. */
+
+@font-face {
+  font-family: 'Josefin Sans';
+  src: url('/static/fonts/josefin-sans-latin-wght-normal.woff2') format('woff2');
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212;
+}
+@font-face {
+  font-family: 'Josefin Sans';
+  src: url('/static/fonts/josefin-sans-latin-ext-wght-normal.woff2') format('woff2');
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Josefin Sans';
+  src: url('/static/fonts/josefin-sans-latin-wght-italic.woff2') format('woff2');
+  font-weight: 100 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --fundo: #0b0a0b;
+  --painel: #161314;
+  --linha: #3a3335;
+  --texto: #ece6e1;
+  --texto-suave: #b9b0aa;
+  --vinho: #c4505f;
+  --vinho-escuro: #6e1f2c;
+  --azul: #7cc9c9;
+  --largura-lateral: 18rem;
+  --largura-texto: 44rem;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: 'Josefin Sans', 'Century Gothic', system-ui, sans-serif;
+  font-weight: 350;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--azul); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { color: #a9e2e2; }
+:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
+h1, h2, h3, h4 { font-weight: 300; line-height: 1.2; letter-spacing: 0.01em; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0 0 0.6em; }
+h2 { font-size: 1.6rem; margin: 1.8em 0 0.6em; }
+h3 { font-size: 1.3rem; margin: 1.6em 0 0.5em; }
+strong, b { font-weight: 600; }
+
+.pular { position: absolute; left: -999px; top: 0; background: var(--texto); color: var(--fundo); padding: 0.5rem 1rem; z-index: 10; }
+.pular:focus { left: 1rem; top: 1rem; }
+
+/* ---------- moldura: lateral com as pinceladas + conteúdo ---------- */
+
+.moldura { display: grid; grid-template-columns: var(--largura-lateral) minmax(0, 1fr); gap: 3rem; max-width: 76rem; margin: 0 auto; padding: 4rem 2rem 2rem; }
+.lateral {
+  position: sticky; top: 2rem; align-self: start;
+  padding: 3.5rem 1.5rem 2rem;
+  background: url('/static/img/pinceladas.webp') no-repeat center top / 100% 100%;
+  min-height: 34rem;
+}
+.marca { display: block; color: var(--texto); text-decoration: none; font-size: 2rem; font-weight: 250; line-height: 1.1; text-shadow: 0 1px 6px #000; margin-bottom: 2rem; }
+.marca:hover { color: #fff; }
+.menu ul { list-style: none; margin: 0; padding: 0; }
+.menu li + li { margin-top: 0.25rem; }
+.menu a { color: var(--texto); text-decoration: none; font-size: 1.15rem; text-transform: lowercase; text-shadow: 0 1px 4px #000; padding: 0.1rem 0.75rem; display: inline-block; }
+.menu a:hover { color: #fff; text-decoration: underline; }
+.menu a[aria-current='page'] { background: rgba(0, 0, 0, 0.55); color: #fff; }
+.idiomas { margin-top: 2rem; display: flex; gap: 0.5rem; padding-left: 0.75rem; }
+.idiomas a { color: var(--texto); text-decoration: none; font-size: 0.95rem; padding: 0.15rem 0.4rem; border: 1px solid transparent; text-shadow: 0 1px 4px #000; }
+.idiomas a[aria-current='true'] { border-color: var(--texto); }
+
+main { min-width: 0; }
+
+@media (max-width: 52rem) {
+  .moldura { grid-template-columns: 1fr; gap: 1.5rem; padding: 0 1rem 1rem; }
+  .lateral { position: static; min-height: 0; padding: 1.25rem 1rem; background: linear-gradient(100deg, var(--vinho-escuro) 0 62%, #1f5556 62% 100%); }
+  .marca { font-size: 1.6rem; margin-bottom: 0.75rem; }
+  .menu ul { display: flex; flex-wrap: wrap; gap: 0.1rem 0.25rem; }
+  .menu li + li { margin-top: 0; }
+  .menu a { padding: 0.1rem 0.4rem; font-size: 1.05rem; }
+  .idiomas { margin-top: 0.75rem; padding-left: 0.4rem; }
+}
+
+/* ---------- textos ---------- */
+
+.prosa { max-width: var(--largura-texto); }
+.prosa p { margin: 0 0 1em; }
+.prosa img { display: block; margin: 1.5rem 0; }
+.prosa figure { margin: 1.5rem 0; }
+.prosa figcaption { color: var(--texto-suave); font-size: 0.95rem; }
+.prosa blockquote { margin: 1.5rem 0; padding-left: 1.25rem; border-left: 3px solid var(--vinho); color: var(--texto-suave); }
+.prosa table { border-collapse: collapse; width: 100%; font-size: 1rem; margin: 1.5rem 0; display: block; overflow-x: auto; }
+.prosa th, .prosa td { border: 1px solid var(--linha); padding: 0.4rem 0.6rem; vertical-align: top; text-align: left; }
+.prosa iframe { max-width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; }
+.prosa ul, .prosa ol { padding-left: 1.4rem; }
+
+.cabeca { margin-bottom: 2rem; }
+.cabeca .sub { color: var(--texto-suave); font-size: 1.2rem; margin: -0.3rem 0 0.6rem; }
+.meta { color: var(--texto-suave); font-size: 0.95rem; }
+.capa { margin: 0 0 2rem; max-width: var(--largura-texto); }
+.capa img { display: block; width: 100%; }
+
+/* ---------- listas ---------- */
+
+.lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.75rem; max-width: var(--largura-texto); }
+.lista li { border-top: 1px solid var(--linha); padding-top: 1.25rem; }
+.lista h2 { font-size: 1.35rem; margin: 0 0 0.35rem; }
+.lista h2 a { color: var(--texto); text-decoration: none; }
+.lista h2 a:hover { color: var(--azul); text-decoration: underline; }
+.lista p { margin: 0.35rem 0 0; color: var(--texto-suave); }
+.lista.com-foto li { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.lista.com-foto img { width: 6rem; height: 6rem; object-fit: cover; }
+.foto-vazia { width: 6rem; height: 6rem; background: var(--painel); }
+
+.paginacao { display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: var(--largura-texto); margin-top: 2.5rem; color: var(--texto-suave); }
+
+/* ---------- início ---------- */
+
+.destaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; margin: 0 0 2.5rem; }
+.destaques figure { margin: 0; }
+.destaques img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.destaques figcaption { font-size: 0.95rem; color: var(--texto-suave); margin-top: 0.35rem; }
+.inicio-colunas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+.mais { margin-top: 1.5rem; }
+
+/* ---------- rodapé ---------- */
+
+.rodape { border-top: 1px solid var(--linha); margin-top: 4rem; padding: 2rem 1rem 3rem; }
+.apoio { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.5rem; }
+.apoio .rotulo { color: var(--texto-suave); font-size: 0.95rem; }
+/* Os logos antigos são claros sobre transparente: ficam sobre um fundo claro. */
+.apoio img { background: #f3efea; padding: 0.4rem; border-radius: 4px; }
+.fim { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 1.5rem; font-size: 0.95rem; color: var(--texto-suave); }
+.pre-linha { white-space: pre-line; }
+
+.erro-pagina { max-width: var(--largura-texto); }
+.botao { display: inline-block; border: 1px solid var(--azul); padding: 0.4rem 1rem; text-decoration: none; }
+.visivel-leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

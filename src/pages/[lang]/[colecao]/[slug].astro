@@ -1,0 +1,38 @@
+---
+// Um item de coleção: /pt/noticias/<slug>, /pt/verbetes/<slug>,
+// /pt/pesquisadores/<slug>, /pt/exposicoes/<slug>.
+import { Image, PortableText } from 'emdash/ui';
+import Base from '../../../layouts/Base.astro';
+import { ehIdioma, formatarData } from '../../../lib/i18n';
+import { getItem, resumoDe } from '../../../lib/conteudo';
+import { ehLista, tituloLista } from '../../../lib/rota';
+
+const { lang, colecao, slug } = Astro.params;
+if (!ehIdioma(lang) || !ehLista(colecao) || !slug) return new Response(null, { status: 404 });
+const item = await getItem(colecao, slug, lang);
+if (!item) return new Response(null, { status: 404 });
+const meta = [colecao === 'pesquisadores' ? '' : item.autor, formatarData(item.data, lang)].filter(Boolean);
+const ogImagem = item.imagem?.src ?? null;
+---
+
+<Base lang={lang} titulo={item.titulo} secao={colecao} descricao={resumoDe(item)} ogImagem={ogImagem}>
+  <article>
+    <header class="cabeca">
+      <p class="meta"><a href={`/${lang}/${colecao}`}>{tituloLista(colecao, lang)}</a></p>
+      <h1 {...item.edit?.title}>{item.titulo}</h1>
+      {item.subtitulo && <p class="sub" {...item.edit?.subtitulo}>{item.subtitulo}</p>}
+      {meta.length > 0 && <p class="meta">{meta.join(' · ')}</p>}
+    </header>
+    {
+      item.imagem && (
+        <figure class="capa">
+          <Image image={item.imagem} alt={item.imagem.alt || ''} />
+        </figure>
+      )
+    }
+    <div class="prosa" {...item.edit?.conteudo}>
+      <PortableText value={item.conteudo} />
+    </div>
+    <p class="mais"><a href={`/${lang}/${colecao}`}>← {tituloLista(colecao, lang)}</a></p>
+  </article>
+</Base>

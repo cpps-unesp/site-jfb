@@ -1,0 +1,46 @@
+---
+// Página inicial: destaques e o texto da Apresentação, que no site antigo já
+// trazia as últimas notícias e publicações escolhidas à mão.
+import { Image, PortableText } from 'emdash/ui';
+import Base from '../../layouts/Base.astro';
+import { ehIdioma, textos } from '../../lib/i18n';
+import { getDestaques, getItem, resumoDe } from '../../lib/conteudo';
+
+const { lang } = Astro.params;
+if (!ehIdioma(lang)) return new Response(null, { status: 404 });
+const t = textos(lang);
+const [destaques, apresentacao] = await Promise.all([getDestaques(lang), getItem('paginas', 'apresentacao', lang)]);
+---
+
+<Base lang={lang} descricao={apresentacao ? resumoDe(apresentacao) : undefined}>
+  <h1 class="visivel-leitor">{t.nomeCompleto}</h1>
+  {
+    destaques.length > 0 && (
+      <div class="destaques">
+        {destaques.map((d) => (
+          <figure {...d.edit?.imagem}>
+            {d.link ? (
+              <a href={d.link}>
+                <Image image={d.imagem} alt={d.imagem.alt || d.titulo} />
+              </a>
+            ) : (
+              <Image image={d.imagem} alt={d.imagem.alt || d.titulo} />
+            )}
+          </figure>
+        ))}
+      </div>
+    )
+  }
+  <div class="inicio-colunas">
+    {
+      apresentacao && (
+        <section class="prosa" {...apresentacao.edit?.conteudo}>
+          <PortableText value={apresentacao.conteudo} />
+        </section>
+      )
+    }
+    <p class="mais">
+      <a href={`/${lang}/noticias`}>{t.verTodasNoticias} →</a>
+    </p>
+  </div>
+</Base>

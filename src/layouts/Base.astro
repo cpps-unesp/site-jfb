@@ -1,0 +1,112 @@
+---
+import { IDIOMAS, LOCALE, textos, type Idioma } from '../lib/i18n';
+import { getAparencia, getMenuPrincipal } from '../lib/conteudo';
+
+interface Props {
+  lang: Idioma;
+  // Título da página; sem ele, o do site.
+  titulo?: string | null;
+  descricao?: string;
+  // Caminho da seção ativa no menu, sem o idioma (ex.: 'noticias').
+  secao?: string;
+  ogImagem?: string | null;
+  naoIndexar?: boolean;
+}
+
+const { lang, titulo, descricao, secao = '', ogImagem, naoIndexar } = Astro.props;
+const t = textos(lang);
+const [aparencia, menu] = await Promise.all([getAparencia(lang), getMenuPrincipal(lang)]);
+
+const tituloPagina = titulo ? `${titulo} · ${aparencia.nome}` : aparencia.nome;
+const descricaoPagina = descricao || aparencia.chamada;
+const caminho = Astro.url.pathname;
+const resto = caminho.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+const alternativos = IDIOMAS.map((l) => ({ lang: l, href: new URL(`/${l}${resto || '/'}`, Astro.site).toString() }));
+const canonico = new URL(caminho, Astro.site).toString();
+const imagem = ogImagem ? new URL(ogImagem, Astro.site).toString() : null;
+const ativo = (url: string) => !!secao && url.replace(/^\/[a-z]{2}\//, '').split('/')[0] === secao;
+---
+
+<!doctype html>
+<html lang={LOCALE[lang].html}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloPagina}</title>
+    <meta name="description" content={descricaoPagina} />
+    <meta name="robots" content={naoIndexar ? 'noindex, nofollow' : 'index, follow'} />
+    <link rel="canonical" href={canonico} />
+    {alternativos.map((a) => <link rel="alternate" hreflang={LOCALE[a.lang].html} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={alternativos[0].href} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={aparencia.nome} />
+    <meta property="og:title" content={titulo || aparencia.nome} />
+    <meta property="og:description" content={descricaoPagina} />
+    {imagem && <meta property="og:image" content={imagem} />}
+    <meta property="og:url" content={canonico} />
+    <meta property="og:locale" content={LOCALE[lang].og} />
+    <meta name="theme-color" content="#0b0a0b" />
+    <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/static/fonts/josefin-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/static/css/site.css" />
+  </head>
+  <body>
+    <a class="pular" href="#conteudo">{t.pular}</a>
+    <div class="moldura">
+      <header class="lateral">
+        <a class="marca" href={`/${lang}/`} aria-label={`${aparencia.nome}, ${t.paginaInicial}`}>
+          <span {...aparencia.edit?.title}>{aparencia.nome}</span>
+        </a>
+        <nav class="menu" aria-label={t.menuPrincipal}>
+          <ul>
+            {
+              menu.map((item) => (
+                <li>
+                  <a
+                    href={item.url}
+                    aria-current={ativo(item.url) ? 'page' : undefined}
+                    rel={item.externo ? 'noopener' : undefined}
+                  >
+                    {item.rotulo}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <nav class="idiomas" aria-label={t.idioma}>
+          {
+            alternativos.map((a) => (
+              <a
+                href={`/${a.lang}${resto || '/'}`}
+                hreflang={LOCALE[a.lang].html}
+                lang={LOCALE[a.lang].html}
+                title={LOCALE[a.lang].nome}
+                aria-current={a.lang === lang ? 'true' : undefined}
+              >
+                {LOCALE[a.lang].sigla}
+              </a>
+            ))
+          }
+        </nav>
+      </header>
+      <main id="conteudo">
+        <slot />
+      </main>
+    </div>
+    <footer class="rodape">
+      <div class="apoio">
+        <span class="rotulo">{t.apoio}</span>
+        <a href="https://www.unesp.br/" rel="noopener"><img src="/static/img/logo-unesp.png" alt="Unesp" width="65" height="65" loading="lazy" /></a>
+        <a href="https://fapesp.br/" rel="noopener"><img src="/static/img/logo-fapesp.png" alt="FAPESP" width="100" height="21" loading="lazy" /></a>
+        <img src="/static/img/logo-cedaph.png" alt="CEDAPH" width="80" height="37" loading="lazy" />
+        <img src="/static/img/logo-cedap.png" alt="CEDAP" width="80" height="41" loading="lazy" />
+      </div>
+      <div class="fim">
+        {aparencia.email && <a href={`mailto:${aparencia.email}`}>{aparencia.email}</a>}
+        {aparencia.endereco && <span class="pre-linha">{aparencia.endereco}</span>}
+        <a href="/_emdash/admin" rel="nofollow">{t.areaRestrita}</a>
+      </div>
+    </footer>
+  </body>
+</html>
